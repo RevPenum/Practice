@@ -9,20 +9,17 @@
 parameters:
   - name: Deploy_Application
     displayName: Deploy_Application
-    type: string
-  - name: Deploy_App
-    displayName: Deploy_App
-    type: object
-    
     values:
       - pndemea-order
       - pndemea-oms-api
       - pndemea-notifications
       - pndemea-catalog-oms-eod
       - pndemea-inventory
-  
-  
-  
+    type: string
+  - name: Deploy_App
+    displayName: Deploy_App
+    type: object
+    
     default: 
         - pndemea-order
         - pndemea-oms-api
