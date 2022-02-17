@@ -1,0 +1,158 @@
+#Individual------
+
+# Maven
+
+# Build your Java project and run tests with Apache Maven.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+parameters:
+  - name: Deploy_Application
+    displayName: Deploy_Application
+    type: string
+  - name: Deploy_App
+    displayName: Deploy_App
+    type: object
+  
+  
+  
+    default: 
+    - pndemea-order
+    - pndemea-oms-api
+     - pndemea-notifications
+     - pndemea-catalog-oms-eod
+     - pndemea-inventory
+
+
+pool:
+  vmImage: ubuntu-latest
+  
+ 
+steps:
+  - ${{ each value in parameters.Deploy_App }}:
+  - script: echo ${{ value }}
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      script: |
+        Write-Host "Hello World Bnagalore"
+        echo "*****Starting Maven Build/Deploy*****"
+        cd projects-emea
+        cd pndemea-common
+        pwd
+  - task: DownloadSecureFile@1
+    inputs:
+        secureFile: 'settings.xml'
+    
+  - task: Maven@3
+    inputs:
+        mavenPomFile: /home/vsts/work/1/s/projects-emea/pndemea-common/pom.xml
+        mavenOptions: '-Xmx3072m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.8'
+        jdkArchitectureOption: 'x64'
+        publishJUnitResults: true
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
+        goals: 'clean install -DskipTests'
+
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      script:  |
+        cd /home/vsts/work/1/s/projects-emea/${{ parameters.Deploy_Application }}
+  - task: Maven@3
+    inputs:
+      mavenPomFile: '/home/vsts/work/1/s/projects-emea/${{ parameters.Deploy_Application }}/pom.xml'
+      goals: 'compile'
+      publishJUnitResults: true
+      testResultsFiles: '**/surefire-reports/TEST-*.xml'
+      javaHomeOption: 'JDKVersion'
+      mavenVersionOption: 'Default'
+      mavenAuthenticateFeed: false
+      effectivePomSkip: false
+      sonarQubeRunAnalysis: false
+      findBugsRunAnalysis: true
+  - task: Maven@3
+    inputs:
+      mavenPomFile: '/home/vsts/work/1/s/projects-emea/${{ parameters.Deploy_Application }}/pom.xml'
+      goals: 'clean package deploy -e -DmuleDeploy -Dusername=svc-app-pandora-build-user -Dpassword=mz9fmBarW9A=H(AH -DskipTests -P cloudhub-qa -DbusinessGroup=Pandora-EMEA -Denvironment=QA-EMEA '
+      publishJUnitResults: false
+      javaHomeOption: 'JDKVersion'
+      mavenVersionOption: 'Default'
+      mavenAuthenticateFeed: false
+      effectivePomSkip: false
+      sonarQubeRunAnalysis: false
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop'
+      publishLocation: 'Container'
+
+
+
+
+# Maven
+
+# Build your Java project and run tests with Apache Maven.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+
+
+#trigger:
+ #-develop-apac
+
+ 
+
+
+  - task: Maven@3
+    inputs:
+      mavenPomFile: /home/vsts/work/1/s/projects-emea/pndemea-common/pom.xml
+      mavenOptions: '-Xmx3072m'
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '1.8'
+      jdkArchitectureOption: 'x64'
+      publishJUnitResults: true
+      testResultsFiles: '**/surefire-reports/TEST-*.xml'
+      goals: 'clean install -DskipTests'
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      script:  |
+        cd /home/vsts/work/1/s/projects-emea/${{ value }}  
+        pwd
+  - task: Maven@3
+    inputs:
+      mavenPomFile: '/home/vsts/work/1/s/projects-emea/${{ value }}/pom.xml'
+      goals: 'compile'
+      publishJUnitResults: true
+      testResultsFiles: '**/surefire-reports/TEST-*.xml'
+      javaHomeOption: 'JDKVersion'
+      mavenVersionOption: 'Default'
+      mavenOptions: "-Xmx4G"
+      mavenAuthenticateFeed: false
+      effectivePomSkip: false
+      sonarQubeRunAnalysis: false
+      findBugsRunAnalysis: true
+  
+  - task: Maven@3
+    inputs:
+      mavenPomFile: '/home/vsts/work/1/s/projects-emea/${{ value }}/pom.xml'
+      goals: clean package deploy -e -DmuleDeploy -Dusername=svc-app-pandora-build-user -Dpassword=mz9fmBarW9A=H(AH -DskipTests -P cloudhub-qa -DbusinessGroup=Pandora-EMEA -Denvironment=QA-EMEA
+      publishJUnitResults: false
+      javaHomeOption: 'JDKVersion'
+      mavenOptions: "-Xmx4G"
+      mavenVersionOption: 'Default'
+      mavenAuthenticateFeed: false
+      effectivePomSkip: false
+      sonarQubeRunAnalysis: false
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop'
+      publishLocation: 'Container'
+
+
+
+
+
