@@ -13,15 +13,22 @@ parameters:
   - name: Deploy_App
     displayName: Deploy_App
     type: object
+    
+    values:
+      - pndemea-order
+      - pndemea-oms-api
+      - pndemea-notifications
+      - pndemea-catalog-oms-eod
+      - pndemea-inventory
   
   
   
     default: 
-    - pndemea-order
-    - pndemea-oms-api
-     - pndemea-notifications
-     - pndemea-catalog-oms-eod
-     - pndemea-inventory
+        - pndemea-order
+        - pndemea-oms-api
+        - pndemea-notifications
+        - pndemea-catalog-oms-eod
+        - pndemea-inventory
 
 
 pool:
